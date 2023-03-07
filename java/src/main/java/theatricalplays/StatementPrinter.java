@@ -1,5 +1,7 @@
 package theatricalplays;
 
+import theatricalplays.playtype.PlayType;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.Map;
@@ -15,30 +17,9 @@ public class StatementPrinter {
 
         for (Performance performance : invoice.performances) {
             Play play = plays.get(performance.playID);
-            int priceInUsd = 0;
-
-            switch (play.type) {
-                case "tragedy":
-                    priceInUsd = 400;
-                    if (performance.audience > 30) {
-                        priceInUsd += 10 * (performance.audience - 30);
-                    }
-                    break;
-                case "comedy":
-                    priceInUsd = 300;
-                    if (performance.audience > 20) {
-                        priceInUsd += 100 + 5 * (performance.audience - 20);
-                    }
-                    priceInUsd += 3 * performance.audience;
-                    break;
-                default:
-                    throw new Error("unknown type: ${play.type}");
-            }
-
-            // add volume credits
-            volumeCredits += Math.max(performance.audience - 30, 0);
-            // add extra credit for every ten comedy attendees
-            if ("comedy".equals(play.type)) volumeCredits += performance.audience / 5;
+            final PlayType playType = PlayType.fromId(play.type);
+            volumeCredits += playType.getVolumeCredits(performance.audience);
+            final int priceInUsd = playType.getPriceInUsd(performance.audience);
 
             // print line for this order
             result += String.format("  %s: %s (%s seats)\n", play.name, currencyFormatter.format(priceInUsd), performance.audience);
