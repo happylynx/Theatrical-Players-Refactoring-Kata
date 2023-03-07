@@ -7,7 +7,7 @@ import java.util.Map;
 public class StatementPrinter {
 
     public String print(Invoice invoice, Map<String, Play> plays) {
-        int totalPriceInCents = 0;
+        int totalPriceInUsd = 0;
         int volumeCredits = 0;
         String result = String.format("Statement for %s\n", invoice.customer);
 
@@ -15,21 +15,21 @@ public class StatementPrinter {
 
         for (Performance performance : invoice.performances) {
             Play play = plays.get(performance.playID);
-            int priceInCents = 0;
+            int priceInUsd = 0;
 
             switch (play.type) {
                 case "tragedy":
-                    priceInCents = 40000;
+                    priceInUsd = 400;
                     if (performance.audience > 30) {
-                        priceInCents += 1000 * (performance.audience - 30);
+                        priceInUsd += 10 * (performance.audience - 30);
                     }
                     break;
                 case "comedy":
-                    priceInCents = 30000;
+                    priceInUsd = 300;
                     if (performance.audience > 20) {
-                        priceInCents += 10000 + 500 * (performance.audience - 20);
+                        priceInUsd += 100 + 5 * (performance.audience - 20);
                     }
-                    priceInCents += 300 * performance.audience;
+                    priceInUsd += 3 * performance.audience;
                     break;
                 default:
                     throw new Error("unknown type: ${play.type}");
@@ -41,10 +41,10 @@ public class StatementPrinter {
             if ("comedy".equals(play.type)) volumeCredits += performance.audience / 5;
 
             // print line for this order
-            result += String.format("  %s: %s (%s seats)\n", play.name, currencyFormatter.format(priceInCents / 100), performance.audience);
-            totalPriceInCents += priceInCents;
+            result += String.format("  %s: %s (%s seats)\n", play.name, currencyFormatter.format(priceInUsd), performance.audience);
+            totalPriceInUsd += priceInUsd;
         }
-        result += String.format("Amount owed is %s\n", currencyFormatter.format(totalPriceInCents / 100));
+        result += String.format("Amount owed is %s\n", currencyFormatter.format(totalPriceInUsd));
         result += String.format("You earned %s credits\n", volumeCredits);
         return result;
     }
