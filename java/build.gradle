@@ -28,3 +28,5 @@ pitest {
     targetClasses = ['theatricalplays.*']
     junit5PluginVersion = '1.0.0'
 }
+
+tasks.wrapper.gradleVersion = "8.0.2"
